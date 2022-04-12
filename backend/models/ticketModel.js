@@ -9,7 +9,7 @@ const TicketSchema = new mongooose.Schema({
             type: String,
             required: true
         },
-        severity:{
+        severity: {
             type: String,
             required: true
         },
@@ -17,9 +17,13 @@ const TicketSchema = new mongooose.Schema({
             type: String,
             required: true
         },
-        status:{
-            type: Boolean,
-            required: true
+        status: {
+            type: String,
+            default: "Open"
+        },
+        date: {
+            type: Date,
+            default: Date.now
         }
 
 }, {
@@ -28,4 +32,4 @@ const TicketSchema = new mongooose.Schema({
 )
 
 
-module.exports = mongooose.model('Ticket')
+module.exports = mongooose.model('Ticket', TicketSchema)
