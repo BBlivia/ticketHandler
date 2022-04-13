@@ -7,7 +7,7 @@ const { getTicket, createTicket, updateTicket, deleteTicket } = require('../cont
 router.route('/').get(getTicket).post(createTicket)
 router.route('/:id').put(updateTicket).delete(deleteTicket)
 
-//router.post('/', createTicket)
+
 
 
 /*

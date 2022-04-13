@@ -1,6 +1,11 @@
 const mongooose = require('mongoose')
 
 const TicketSchema = new mongooose.Schema({
+        user:{
+            type: mongooose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'User'
+        },
         subject:{
             type: String,
             required: true
@@ -26,8 +31,6 @@ const TicketSchema = new mongooose.Schema({
             default: Date.now
         }
 
-}, {
-    timestamps:true
 }
 )
 

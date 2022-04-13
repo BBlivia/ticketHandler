@@ -17,6 +17,7 @@ app.use(express.urlencoded({extended: false })) // so we can get our urls routes
 
 //ROUTES
 app.use('/api/tickets', require('./routes/ticketsRoutes'))
+app.use('/api/users', require('./routes/userRoutes'))
 app.use(errorHandler)
 
 
