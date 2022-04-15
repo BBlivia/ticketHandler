@@ -3,12 +3,26 @@
 // private access
 const asyncHandler = require("express-async-handler")
 const Ticket = require('../models/ticketModel')
+const User = require("../models/userModel")
 
-    const getTicket = asyncHandler(async (req, res) =>{
+    const getAllTicket = asyncHandler(async (req, res) =>{
        const tickets = await Ticket.find()
+      
         res.status(200).json({tickets})
         
     })
+
+    const getAssigned = asyncHandler(async(req, res)=>{
+      
+        const theTickets = await Ticket.find({user: req.user.id})
+
+      res.status(200).json({theTickets})
+      
+      
+    })
+    
+
+   
 
     const createTicket = asyncHandler(async (req, res) =>{
          if(!req.body){
@@ -17,6 +31,7 @@ const Ticket = require('../models/ticketModel')
             
             }
             const ticket = await Ticket.create({
+              user: req.user.id,
               subject: req.body.subject,
               description: req.body.description,
               severity: req.body.severity,
@@ -35,8 +50,22 @@ const Ticket = require('../models/ticketModel')
           res.status(400)
           throw new Error('ticket not found')
         }
+
+        const user = await User.findById(req.user.id)
+          //check for user
+        if(!user){
+          res.status(401)
+          throw new Error('you have no tickets')
+        }
+        
+        //logged in user matches goal user
+        if(ticket.user.toString() !== user.id){
+          res.status(401)
+          throw new Error ('user not found')
+        }
+
         const updatedTicket = await Ticket.findByIdAndUpdate(
-          req.params.id, 
+          req.params.id, req.body,
           {
             status: 'Closed'
           }
@@ -57,7 +86,18 @@ const Ticket = require('../models/ticketModel')
         }
        await ticket.deleteOne()
         
-        
+       const user = await User.findById(req.user.id)
+       //check for user
+     if(!user){
+       res.status(401)
+       throw new Error('you have no tickets')
+     }
+     
+     //logged in user matches goal user
+     if(ticket.user.toString() !== user.id){
+       res.status(401)
+       throw new Error ('user not found')
+     }
 
         res.status(200).json({id: req.params.id}) // for front end later on
       } catch (error) {
@@ -68,10 +108,12 @@ const Ticket = require('../models/ticketModel')
     })
 
     module.exports ={
-        getTicket,
+        getAllTicket,
+        getAssigned,
         createTicket,
         updateTicket,
         deleteTicket
+      
     }
 
 

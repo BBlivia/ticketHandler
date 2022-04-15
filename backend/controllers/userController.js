@@ -12,7 +12,7 @@ const asyncHandler = require('express-async-handler')
 
 //Registation
 const registerUser = asyncHandler(async (req, res)=> {
-    const {email, password} = req.body;
+    const { username, email, password} = req.body;
     if(!username || !email|| !password){
         res.status(400)
         throw new Error('please add in all fields')
@@ -35,7 +35,7 @@ const registerUser = asyncHandler(async (req, res)=> {
         username,
         email,
         password: hashedPassword,
-        token: generateToken(user._id)
+       
     })
 
     if(user){
@@ -43,6 +43,7 @@ const registerUser = asyncHandler(async (req, res)=> {
             _id: user.id,
             username: user.username,
             email: user.email,
+            token: generateToken(user._id)
         })
     }else{
         res.status(400)
@@ -54,11 +55,11 @@ const registerUser = asyncHandler(async (req, res)=> {
 
 
 const loginUser = asyncHandler(async(req, res)=> {
-    const {username, email, password} = req.body;
+    const { email, password} = req.body;
 
 
     //checking for user email
-    const user = User.findOne({email})
+    const user = await User.findOne({email})
 
     if(user && (await bcrypt.compare(password, user.password))){
         res.json({
@@ -75,14 +76,20 @@ const loginUser = asyncHandler(async(req, res)=> {
    
 }) 
 
-
+//gets user data
+// private route
 
 const getProfile = asyncHandler(async(req, res)=> {
-    res.status(200).json({message: "welcome BACK to your profile"})
+    const {_id, username, email, } = await User.findById(req.user.id)
+    res.status(200).json({
+        id : _id,
+        username,
+        email,
+    })
 })
 
 
-//Generate JW Token
+//Generate JW Token jtw.io
 
 const generateToken = (id)=>{
     return jwt.sign( {id}, process.env.JWT_SECRET, {
